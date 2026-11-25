@@ -40,12 +40,6 @@ public abstract class ScreenMixin {
         }
     }
 
-    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
-    private void onMouseClick(double mouseX, double mouseY, int button, CallbackInfo ci) {
-        if (client == null || !(client.currentScreen instanceof TitleScreen)) return;
-        if (MainMenu.mouseClicked(mouseX, mouseY, button)) ci.cancel();
-    }
-
     @Inject(method = "render", at = @At("TAIL"))
     private void onRenderTail(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (client == null) return;

@@ -8,6 +8,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.session.Session;
 import net.minecraft.text.Text;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.Color;
 import java.io.File;
@@ -30,6 +31,7 @@ public final class MainMenu {
     private static int background = -1;
     private static int logo = -1;
     private static boolean panelOpen;
+    private static boolean lastPressed;
     private static List<String> accounts;
     private static File accountsFile;
 
@@ -55,6 +57,13 @@ public final class MainMenu {
     }
 
     public static void drawOverlay(DrawContext context, int mouseX, int mouseY) {
+        boolean pressed = GLFW.glfwGetMouseButton(mc.getWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_LEFT)
+                == GLFW.GLFW_PRESS;
+        if (pressed && !lastPressed) {
+            mouseClicked(mouseX, mouseY, 0);
+        }
+        lastPressed = pressed;
+
         int labelWidth = 152;
         UIRenderer.renderRoundedRect(context, 14, 14, labelWidth, 24, 5, PANEL);
         context.drawBorder(14, 14, labelWidth, 24, new Color(90, 60, 150, 220).getRGB());

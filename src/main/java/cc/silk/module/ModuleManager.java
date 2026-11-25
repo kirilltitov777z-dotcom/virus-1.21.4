@@ -79,7 +79,8 @@ public final class ModuleManager {
                 new ContainerSlots(), new FullBright(), new Watermark(), new TargetHUD(),
                 new SwingSpeed(),
                 new Notifications(), new ArrowESP(), new OutlineESP(), new ESP2D(), new TargetESP(),
-                new ArrayList(), new Trajectories(), new ParticleRain(), new AuraParticles(), new CustomFov());
+                new ArrayList(), new Trajectories(), new ParticleRain(), new AuraParticles(), new CustomFov(),
+                new KillEffect());
 
         // Misc
         add(
