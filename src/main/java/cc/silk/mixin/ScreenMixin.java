@@ -26,11 +26,6 @@ public abstract class ScreenMixin {
     private void renderBackgroundInject(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (client == null) return;
         Screen currentScreen = client.currentScreen;
-        if (currentScreen instanceof TitleScreen) {
-            MainMenu.drawBackground(client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
-            ci.cancel();
-            return;
-        }
         if (currentScreen instanceof ClickGui) {
             ci.cancel();
             return;
