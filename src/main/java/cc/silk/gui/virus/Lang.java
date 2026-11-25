@@ -222,7 +222,6 @@ public final class Lang {
                 case "utilities" -> "Utilities";
                 case "all" -> "All";
                 case "renderer" -> "Renderer";
-                case "visual" -> "Visual";
                 case "particles" -> "Particles";
                 case "hint" -> "Enter your search query...";
                 case "admin" -> "Administrator";

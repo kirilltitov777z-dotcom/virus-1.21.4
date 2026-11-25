@@ -10,7 +10,7 @@ import meteordevelopment.orbit.EventHandler;
 public final class CustomFov extends Module {
 
     private final NumberSetting fov = new NumberSetting("FOV", 30.0, 180.0, 90.0, 1.0);
-    private double original = -1;
+    private int original = -1;
 
     public CustomFov() {
         super("Custom FOV", "Changes your field of view and restores it on disable", Category.VISUAL);
@@ -25,7 +25,7 @@ public final class CustomFov extends Module {
     @EventHandler
     private void onTick(TickEvent event) {
         if (isNull()) return;
-        mc.options.getFov().setValue(fov.getValue());
+        mc.options.getFov().setValue((int) fov.getValue());
     }
 
     @Override
