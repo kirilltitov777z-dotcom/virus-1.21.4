@@ -42,12 +42,11 @@ public final class AutoAuction extends Module {
         if (!mode.isMode("Snipe") && !mode.isMode("Both")) return;
 
         String message = null;
-        if (event.getPacket() instanceof ProfilelessChatMessageS2CPacket packet) {
-            message = packet.comp_1097().getString();
-        } else if (event.getPacket() instanceof ChatMessageS2CPacket packet) {
-            message = packet.comp_1103().getString();
+        if (event.getPacket() instanceof ProfilelessChatMessageS2CPacket
+                || event.getPacket() instanceof ChatMessageS2CPacket) {
+            message = textOf(event.getPacket());
         }
-        if (message == null) return;
+        if (message == null || message.isEmpty()) return;
 
         String key = keyword.getValue().toLowerCase();
         if (!message.toLowerCase().contains(key)) return;
@@ -68,6 +67,21 @@ public final class AutoAuction extends Module {
         String command = sellCommand.getValue().replace("{item}", keyword.getValue());
         mc.player.networkHandler.sendChatCommand(command.startsWith("/") ? command.substring(1) : command);
         lastAction = System.currentTimeMillis();
+    }
+
+    /** Finds the Text component of a chat packet without depending on mapped accessor names. */
+    private static String textOf(Object packet) {
+        try {
+            for (java.lang.reflect.Method method : packet.getClass().getMethods()) {
+                if (method.getParameterCount() == 0
+                        && net.minecraft.text.Text.class.isAssignableFrom(method.getReturnType())) {
+                    Object value = method.invoke(packet);
+                    if (value instanceof net.minecraft.text.Text text) return text.getString();
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 
     private long parsePrice(String message) {
