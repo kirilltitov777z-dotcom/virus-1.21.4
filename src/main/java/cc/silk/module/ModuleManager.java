@@ -61,6 +61,8 @@ public final class ModuleManager {
                 new AimAssist(), new SwordHotSwap(), new AutoCrystal(), new SwordSwap(), new BreachSwap(),
                 new KeyCrystal(), new KeyAnchor(), new KeyLava(), new AutoPot(), new StunCob(),
                 new AutoCart(), new CrystalOptimizer(), new Criticals());
+        // Event timers (bypass/assist modules)
+        add(new FunTime(), new SpookyTime());
         // Movement
         add(new Sprint(), new AutoFirework(), new AutoHeadHitter(), new KeepSprint());
 
@@ -76,7 +78,7 @@ public final class ModuleManager {
                 new ContainerSlots(), new FullBright(), new Watermark(), new TargetHUD(),
                 new SwingSpeed(),
                 new Notifications(), new ArrowESP(), new OutlineESP(), new ESP2D(), new TargetESP(),
-                new ArrayList(), new Trajectories());
+                new ArrayList(), new Trajectories(), new ParticleRain(), new AuraParticles(), new CustomFov());
 
         // Misc
         add(

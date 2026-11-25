@@ -8,6 +8,7 @@ import cc.silk.module.Module;
 import cc.silk.module.modules.misc.Teams;
 import cc.silk.module.setting.BooleanSetting;
 import cc.silk.module.setting.ModeSetting;
+import cc.silk.module.setting.NumberSetting;
 import cc.silk.module.setting.RangeSetting;
 import cc.silk.utils.friend.FriendManager;
 import cc.silk.utils.math.MathUtils;
@@ -46,6 +47,11 @@ public final class TriggerBot extends Module {
     public static final BooleanSetting onlyWhenMouseDown = new BooleanSetting("Only Mouse Hold", false);
     public static final BooleanSetting disableOnWorldChange = new BooleanSetting("Disable on Load", false);
     public static final BooleanSetting samePlayer = new BooleanSetting("Same Player", false);
+    public static final BooleanSetting antiDetect = new BooleanSetting("Anti-Detect", true);
+    public static final BooleanSetting onlyGround = new BooleanSetting("Only on Ground", false);
+    public static final BooleanSetting pauseOnVelocity = new BooleanSetting("Pause on Velocity", true);
+    public static final BooleanSetting resetOnDeath = new BooleanSetting("Reset on Death", true);
+    public static final NumberSetting switchDelayMS = new NumberSetting("Switch Delay (MS)", 0, 500, 90, 10);
 
     private final TimerUtil timer = new TimerUtil();
     private final TimerUtil samePlayerTimer = new TimerUtil();
@@ -55,6 +61,7 @@ public final class TriggerBot extends Module {
 
     private boolean waitingForReaction = false;
     private long currentReactionDelay = 0;
+    private long lastTargetSwitch = 0;
     private float randomizedPostDelay = 0;
     private float randomizedThreshold = 0;
     private Entity target;
@@ -67,7 +74,8 @@ public final class TriggerBot extends Module {
                 axePostDelay, reactionTime,
                 cooldownMode, critMode, ignorePassiveMobs, ignoreCrystals, respectShields,
                 ignoreInvisible, onlyWhenMouseDown, useOnlySwordOrAxe,
-                disableOnWorldChange, samePlayer);
+                disableOnWorldChange, samePlayer, antiDetect, onlyGround, pauseOnVelocity, resetOnDeath,
+                switchDelayMS);
     }
 
     @EventHandler
@@ -86,10 +94,22 @@ public final class TriggerBot extends Module {
             return;
         if (mc.currentScreen != null)
             return;
+        if (resetOnDeath.getValue() && !mc.player.isAlive())
+            return;
+        if (onlyGround.getValue() && !mc.player.isOnGround())
+            return;
+        if (pauseOnVelocity.getValue() && mc.player.hurtTime > 0)
+            return;
 
         target = mc.targetedEntity;
         if (target == null)
             return;
+        if (antiDetect.getValue() && !target.getUuidAsString().equals(lastTargetUUID)) {
+            if (System.currentTimeMillis() - lastTargetSwitch < switchDelayMS.getValue()) {
+                return;
+            }
+            lastTargetSwitch = System.currentTimeMillis();
+        }
         if (!isHoldingSwordOrAxe())
             return;
 

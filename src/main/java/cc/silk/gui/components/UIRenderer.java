@@ -79,6 +79,8 @@ public class UIRenderer {
             case MOVEMENT -> new Color(100, 255, 100);
             case PLAYER -> new Color(150, 100, 255);
             case RENDER -> new Color(255, 150, 100);
+            case VISUAL -> new Color(120, 220, 255);
+            case PARTICLES -> new Color(255, 210, 120);
             case MISC -> new Color(200, 100, 255);
             case CLIENT -> new Color(150, 150, 150);
             case CONFIG -> new Color(100, 200, 255);

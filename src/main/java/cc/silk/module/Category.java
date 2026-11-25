@@ -8,6 +8,8 @@ public enum Category {
     PLAYER("Player"),
     MOVEMENT("Movement"),
     RENDER("Render"),
+    VISUAL("Visual"),
+    PARTICLES("Particles"),
     MISC("Misc"),
     CLIENT("Client"),
     CONFIG("Config");

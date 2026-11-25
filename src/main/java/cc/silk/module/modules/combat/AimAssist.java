@@ -46,7 +46,13 @@ public class AimAssist extends Module {
     private final BooleanSetting gcd = new BooleanSetting("GCD", true);
     private final ModeSetting priority = new ModeSetting("Priority", "Distance", "Distance", "Health");
 
+    private final BooleanSetting antiDetect = new BooleanSetting("Anti-Detect", true);
+    private final BooleanSetting onlyGround = new BooleanSetting("Only on Ground", false);
+    private final BooleanSetting resetOnDeath = new BooleanSetting("Reset on Death", true);
+    private final NumberSetting switchDelay = new NumberSetting("Switch Delay (MS)", 0.0, 500.0, 80.0, 10.0);
+
     private Entity currentTarget = null;
+    private long lastSwitch;
     private long lastUpdateTime = 0;
     private float currentBaseSpeed = 10f;
     private float nextBaseSpeed = 10f;
@@ -57,7 +63,7 @@ public class AimAssist extends Module {
         addSettings(
                 maxYawSpeed, minYawSpeed, maxPitchSpeed, minPitchSpeed, fov, range, smoothing, pitchThreshold,
                 targetPlayers, targetMobs, weaponsOnly, throughWalls, disableOnTarget, ignoreBlocks,
-                targetLock, gcd, priority);
+                targetLock, gcd, priority, antiDetect, onlyGround, resetOnDeath, switchDelay);
     }
 
     @EventHandler
@@ -76,6 +82,14 @@ public class AimAssist extends Module {
         if (mc.currentScreen != null)
             return;
 
+        if (onlyGround.getValue() && !mc.player.isOnGround())
+            return;
+
+        if (resetOnDeath.getValue() && !mc.player.isAlive()) {
+            currentTarget = null;
+            return;
+        }
+
         if (mc.crosshairTarget != null && mc.crosshairTarget.getType() == HitResult.Type.BLOCK
                 && mc.options.attackKey.isPressed()) {
             return;
@@ -90,7 +104,14 @@ public class AimAssist extends Module {
             return;
         }
 
-        currentTarget = findBestTarget();
+        Entity found = findBestTarget();
+        if (antiDetect.getValue() && found != currentTarget) {
+            if (System.currentTimeMillis() - lastSwitch < switchDelay.getValue()) {
+                return;
+            }
+            lastSwitch = System.currentTimeMillis();
+        }
+        currentTarget = found;
 
         if (mc.targetedEntity == currentTarget && disableOnTarget.getValue()) {
             return;

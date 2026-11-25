@@ -25,99 +25,103 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * "Virus" click GUI: navigation sidebar, module cards with favourites,
- * inline settings, keybind capture and RU/EN interface language.
+ * "Virus" click GUI: compact translucent window, category rail, search with
+ * quick filters, three-column card grid, inline settings, keybind capture,
+ * per-module descriptions and RU/EN interface language.
  */
 public final class VirusGui extends Screen {
 
     private final MinecraftClient mc = MinecraftClient.getInstance();
 
-    private static final Color WINDOW = new Color(20, 20, 23, 255);
-    private static final Color SIDEBAR = new Color(14, 14, 16, 255);
-    private static final Color CARD = new Color(28, 28, 33, 255);
-    private static final Color CARD_HOVER = new Color(35, 35, 42, 255);
-    private static final Color FIELD = new Color(24, 24, 29, 255);
-    private static final Color BORDER = new Color(48, 48, 56, 255);
-    private static final Color TEXT = new Color(232, 232, 238, 255);
-    private static final Color MUTED = new Color(138, 138, 150, 255);
-    private static final Color ACCENT = new Color(76, 141, 255, 255);
-    private static final Color TRACK = new Color(62, 62, 70, 255);
+    private static final Color WINDOW = new Color(18, 18, 21, 235);
+    private static final Color SIDEBAR = new Color(12, 12, 15, 235);
+    private static final Color FIELD = new Color(30, 30, 36, 255);
+    private static final Color CARD = new Color(26, 26, 31, 220);
+    private static final Color CARD_HOVER = new Color(34, 34, 41, 235);
+    private static final Color BORDER = new Color(52, 52, 60, 255);
+    private static final Color TEXT = new Color(228, 228, 234, 255);
+    private static final Color MUTED = new Color(132, 132, 144, 255);
+    private static final Color ACCENT = new Color(96, 152, 255, 255);
+    private static final Color TRACK = new Color(66, 66, 74, 255);
     private static final Color WHITE = new Color(255, 255, 255, 255);
     private static final Color RED = new Color(236, 92, 92, 255);
 
-    private static final int SIDEBAR_W = 168;
-    private static final int HEADER_H = 42;
-    private static final int CARD_H = 34;
-    private static final int CARD_GAP = 8;
-    private static final int SETTING_H = 20;
+    private static final int RAIL_W = 120;
+    private static final int HEADER_H = 38;
+    private static final int CARD_H = 24;
+    private static final int CARD_GAP = 6;
+    private static final int SETTING_H = 17;
 
     private static final Set<String> FAVOURITES = new HashSet<>();
     private static final Map<String, Boolean> EXPANDED = new HashMap<>();
 
     private final List<NavItem> nav = new ArrayList<>();
     private final List<CardRect> cards = new ArrayList<>();
-    private String selectedId = "combat";
+    private String selectedId = "movement";
     private String search = "";
     private boolean searchFocused;
-    private boolean twoColumns = true;
     private float scroll;
     private int maxScroll;
     private Module listeningModule;
     private NumberSetting draggedSlider;
     private int sliderX, sliderW;
+    private Module hoveredModule;
+    private int hoveredX, hoveredY;
 
     private int winX, winY, winW, winH;
     private int contentX, contentY, contentW, contentH;
-    private int searchX, searchW, langX, gridX, closeX, allX;
+    private int searchX, searchY, searchW, searchH;
+    private int iconFriendsX, iconTargetX, iconStarX;
+    private int langX;
 
     public VirusGui() {
         super(Text.literal("Virus"));
+        nav.add(new NavItem("all", null));
         nav.add(new NavItem("combat", Category.COMBAT));
         nav.add(new NavItem("movement", Category.MOVEMENT));
         nav.add(new NavItem("player", Category.PLAYER));
-        nav.add(new NavItem("visual", Category.RENDER));
-        nav.add(new NavItem("utilities", Category.MISC));
-        nav.add(new NavItem(null, null));
-        nav.add(new NavItem("favorites", null));
-        nav.add(new NavItem("friends", null));
-        nav.add(new NavItem("configs", Category.CONFIG));
-        nav.add(new NavItem("interface", Category.CLIENT));
-        nav.add(new NavItem("macros", null));
+        nav.add(new NavItem("renderer", Category.RENDER));
+        nav.add(new NavItem("visual", Category.VISUAL));
+        nav.add(new NavItem("particles", Category.PARTICLES));
+        nav.add(new NavItem("client", Category.CLIENT));
 
         EXPANDED.putIfAbsent("Kill Aura", true);
         EXPANDED.putIfAbsent("Aim Assist", true);
+        EXPANDED.putIfAbsent("Trigger Bot", true);
     }
 
     private void layout() {
-        winW = Math.min(width - 40, 860);
-        winH = Math.min(height - 40, 580);
-        winX = Math.max(20, (width - winW) / 2 - 70);
+        winW = Math.min(width - 60, 640);
+        winH = Math.min(height - 60, 380);
+        winX = Math.max(20, (width - winW) / 2);
         winY = Math.max(20, (height - winH) / 2);
-        if (winX + winW > width - 12) winX = Math.max(12, width - winW - 12);
 
-        contentX = winX + SIDEBAR_W + 12;
-        contentY = winY + HEADER_H + 10;
-        contentW = winW - SIDEBAR_W - 24;
-        contentH = winH - HEADER_H - 20;
+        searchX = winX + RAIL_W + 8;
+        searchY = winY + 7;
+        searchW = winW - RAIL_W - 16;
+        searchH = 24;
+        iconStarX = winX + winW - 24;
+        iconTargetX = iconStarX - 24;
+        iconFriendsX = iconTargetX - 24;
 
-        searchW = 150;
-        searchX = winX + winW - searchW - 150;
-        langX = winX + winW - 112;
-        gridX = winX + winW - 76;
-        closeX = winX + winW - 38;
-        allX = winX + SIDEBAR_W + 230;
+        contentX = winX + RAIL_W + 8;
+        contentY = winY + HEADER_H + 6;
+        contentW = winW - RAIL_W - 16;
+        contentH = winH - HEADER_H - 12;
+        langX = winX + 12;
     }
 
     private List<Module> modulesFor(String id) {
         List<Module> result = new ArrayList<>();
         List<Module> all = SilkClient.INSTANCE.getModuleManager().getModules();
+        if ("all".equals(id)) return new ArrayList<>(all);
         if ("favorites".equals(id)) {
             for (Module module : all) {
                 if (FAVOURITES.contains(module.getName())) result.add(module);
             }
             return result;
         }
-        if ("friends".equals(id) || "macros".equals(id)) {
+        if ("friends".equals(id)) {
             for (Module module : all) {
                 if (module.getModuleCategory() == Category.MISC) result.add(module);
             }
@@ -144,16 +148,15 @@ public final class VirusGui extends Screen {
         return modules;
     }
 
-    /** Cards have variable height; each column stacks independently. */
     private void computeCards() {
         cards.clear();
         List<Module> modules = filteredModules();
-        int cols = twoColumns ? 2 : 1;
+        int cols = 3;
         int colW = (contentW - CARD_GAP * (cols - 1)) / cols;
         int[] columnY = new int[cols];
         for (int i = 0; i < modules.size(); i++) {
-            int col = twoColumns ? i % 2 : 0;
             Module module = modules.get(i);
+            int col = i % cols;
             boolean expanded = EXPANDED.getOrDefault(module.getName(), false);
             int x = contentX + col * (colW + CARD_GAP);
             int y = contentY + columnY[col] - (int) scroll;
@@ -169,7 +172,7 @@ public final class VirusGui extends Screen {
 
     private int cardHeight(Module module, boolean expanded) {
         if (!expanded) return CARD_H;
-        return CARD_H + 6 + module.getSettings().size() * SETTING_H;
+        return CARD_H + 4 + module.getSettings().size() * SETTING_H;
     }
 
     @Override
@@ -178,92 +181,77 @@ public final class VirusGui extends Screen {
         layout();
         computeCards();
 
-        context.fill(0, 0, width, height, 0x9008080B);
-        round(context, winX, winY, winW, winH, 10, WINDOW);
-        round(context, winX, winY, SIDEBAR_W, winH, 10, SIDEBAR);
-        context.fill(winX + SIDEBAR_W - 10, winY, winX + SIDEBAR_W, winY + winH, SIDEBAR.getRGB());
+        context.fill(0, 0, width, height, 0x8C08080B);
+        round(context, winX, winY, winW, winH, 8, WINDOW);
+        round(context, winX, winY, RAIL_W, winH, 8, SIDEBAR);
+        context.fill(winX + RAIL_W - 6, winY, winX + RAIL_W, winY + winH, SIDEBAR.getRGB());
 
-        drawSidebar(context);
-        drawHeader(context);
+        drawRail(context);
+        drawTopBar(context);
+
+        hoveredModule = null;
         for (CardRect card : cards) {
             if (card.y + card.h < contentY || card.y > contentY + contentH) continue;
             drawCard(context, card, mouseX, mouseY);
         }
+        if (hoveredModule != null) {
+            drawTooltip(context, hoveredModule, hoveredX, hoveredY);
+        }
     }
 
-    private void drawSidebar(DrawContext context) {
-        text(context, "Virus", winX + 22, winY + 22, TEXT, true);
-
-        int y = winY + 62;
+    private void drawRail(DrawContext context) {
+        text(context, "Virus", winX + 14, winY + 10, TEXT, true);
+        int y = winY + 42;
         for (NavItem item : nav) {
-            if (item.id == null) {
-                text(context, Lang.ui("misc"), winX + 22, y + 2, MUTED, false);
-                y += 26;
-                continue;
-            }
             boolean active = selectedId.equals(item.id);
             if (active) {
-                round(context, winX + 10, y - 3, SIDEBAR_W - 20, 22, 5, new Color(38, 38, 45, 255));
-                context.fill(winX + 10, y - 3, 3, 22, ACCENT.getRGB());
+                round(context, winX + 8, y - 3, RAIL_W - 16, 20, 4, new Color(42, 42, 50, 255));
+                context.fill(winX + 8, y - 3, 2, 20, ACCENT.getRGB());
             }
-            text(context, Lang.ui(item.id), winX + 24, y + 2, active ? TEXT : MUTED, active);
-            y += 26;
+            text(context, Lang.ui(item.id), winX + 16, y, active ? TEXT : MUTED, active);
+            y += 24;
         }
-
-        int footY = winY + winH - 48;
-        context.fill(winX + 12, footY - 8, winX + SIDEBAR_W - 12, footY - 7, BORDER.getRGB());
-        circle(context, winX + 26, footY + 8, 9, new Color(56, 56, 66, 255));
-        text(context, Lang.ui("admin"), winX + 42, footY + 2, TEXT, false);
-        text(context, "1337", winX + 42, footY + 14, MUTED, false);
+        round(context, langX, winY + winH - 28, 30, 18, 4, new Color(40, 40, 48, 255));
+        text(context, Lang.russian() ? "RU" : "EN", langX + 8, winY + winH - 26, ACCENT, true);
     }
 
-    private void drawHeader(DrawContext context) {
-        int x = winX + SIDEBAR_W;
-        context.fill(x, winY + HEADER_H - 1, winX + winW, winY + HEADER_H, BORDER.getRGB());
-        text(context, Lang.ui(selectedId), x + 16, winY + 15, TEXT, true);
-
-        text(context, Lang.ui("enableAll"), allX - 92, winY + 16, MUTED, false);
-        drawToggle(context, allX, winY + 14, areAllEnabled());
-
-        round(context, searchX, winY + 10, searchW, 22, 5, FIELD);
-        if (searchFocused) context.fill(searchX, winY + 10, searchX + searchW, winY + 11, ACCENT.getRGB());
-        String shown = search.isEmpty() ? Lang.ui("search") : search;
-        text(context, shown, searchX + 8, winY + 16, search.isEmpty() ? MUTED : TEXT, false);
-        drawSearchIcon(context, searchX + searchW - 18, winY + 16);
-
-        String lang = Lang.russian() ? "RU" : "EN";
-        round(context, langX, winY + 11, 30, 20, 5, new Color(38, 38, 46, 255));
-        text(context, lang, langX + 9, winY + 16, ACCENT, true);
-        drawGridIcon(context, gridX + 4, winY + 16);
-        drawCloseIcon(context, closeX + 4, winY + 16);
+    private void drawTopBar(DrawContext context) {
+        round(context, searchX, searchY, searchW, searchH, 5, FIELD);
+        if (searchFocused) context.fill(searchX, searchY, searchX + searchW, searchY + 1, ACCENT.getRGB());
+        String shown = search.isEmpty() ? Lang.ui("hint") : search;
+        text(context, shown, searchX + 8, searchY + 7, search.isEmpty() ? MUTED : TEXT, false);
+        drawSearchIcon(context, searchX + searchW - 62, searchY + 8);
+        drawPeopleIcon(context, iconFriendsX, searchY + 12);
+        drawCrosshairIcon(context, iconTargetX, searchY + 12);
+        drawStarIcon(context, iconStarX, searchY + 12, "favorites".equals(selectedId));
+        context.fill(searchX, searchY + searchH + 2, winX + winW - 8, searchY + searchH + 3, BORDER.getRGB());
     }
 
     private void drawCard(DrawContext context, CardRect card, int mouseX, int mouseY) {
         Module module = card.module;
-        boolean hovered = hover(mouseX, mouseY, card.x, card.y, card.w, CARD_H);
-        round(context, card.x, card.y, card.w, card.h, 7, hovered ? CARD_HOVER : CARD);
-        if (module.isEnabled()) {
-            context.fill(card.x, card.y + 8, card.x + 2, card.y + CARD_H - 8, ACCENT.getRGB());
-        }
-
-        heart(context, card.x + 16, card.y + 16,
-                FAVOURITES.contains(module.getName()) ? RED : new Color(110, 110, 120, 255));
+        boolean headerHover = hover(mouseX, mouseY, card.x, card.y, card.w, CARD_H);
+        round(context, card.x, card.y, card.w, card.h, 5,
+                headerHover ? CARD_HOVER : CARD);
+        if (module.isEnabled()) context.fill(card.x, card.y + 4, card.x + 1, card.y + CARD_H - 4, ACCENT.getRGB());
 
         String name = Lang.module(module.getName());
-        int available = card.w - 70;
-        while (mc.textRenderer.getWidth(name) > available && name.length() > 4) {
+        while (mc.textRenderer.getWidth(name) > card.w - 32 && name.length() > 4) {
             name = name.substring(0, name.length() - 2);
         }
-        text(context, name, card.x + 32, card.y + 12,
-                module.isEnabled() ? TEXT : new Color(200, 200, 208, 255), true);
-        drawChevron(context, card.x + card.w - 40, card.y + 15, card.expanded);
-        drawToggle(context, card.x + card.w - 26, card.y + 10, module.isEnabled());
+        text(context, name, card.x + 6, card.y + 6, module.isEnabled() ? TEXT : MUTED, true);
+        drawCheck(context, card.x + card.w - 34, card.y + 12, module.isEnabled());
+        drawStarIcon(context, card.x + card.w - 16, card.y + 12, FAVOURITES.contains(module.getName()));
 
+        if (headerHover) {
+            hoveredModule = module;
+            hoveredX = mouseX;
+            hoveredY = mouseY;
+        }
         if (!card.expanded) return;
 
-        int sy = card.y + CARD_H + 4;
+        int sy = card.y + CARD_H + 2;
         for (Setting setting : module.getSettings()) {
-            drawSetting(context, setting, card.x + 10, sy, card.w - 20);
+            drawSetting(context, setting, card.x + 6, sy, card.w - 12);
             sy += SETTING_H;
         }
     }
@@ -271,30 +259,45 @@ public final class VirusGui extends Screen {
     private void drawSetting(DrawContext context, Setting setting, int x, int y, int w) {
         String label = Lang.setting(setting.getName());
         if (setting instanceof BooleanSetting boolSetting) {
-            text(context, label, x, y + 4, MUTED, false);
-            drawCheckbox(context, x + w - 16, y + 2, boolSetting.getValue());
-        } else if (setting instanceof NumberSetting number) {
             text(context, label, x, y + 2, MUTED, false);
+            drawCheckbox(context, x + w - 13, y + 1, boolSetting.getValue());
+        } else if (setting instanceof NumberSetting number) {
+            text(context, label, x, y, MUTED, false);
             String value = format(number.getValue());
-            text(context, value, x + w - (int) mc.textRenderer.getWidth(value), y + 2, TEXT, false);
+            text(context, value, x + w - (int) mc.textRenderer.getWidth(value), y, TEXT, false);
             double norm = (number.getValue() - number.getMin()) / (number.getMax() - number.getMin());
             int px = x + (int) (w * norm);
-            context.fill(x, y + 13, x + w, y + 16, TRACK.getRGB());
-            context.fill(x, y + 13, px, y + 16, ACCENT.getRGB());
-            circle(context, px, y + 14, 3, WHITE);
+            context.fill(x, y + 11, x + w, y + 13, TRACK.getRGB());
+            context.fill(x, y + 11, px, y + 13, ACCENT.getRGB());
+            circle(context, px, y + 12, 2, WHITE);
         } else if (setting instanceof ModeSetting mode) {
-            text(context, label, x, y + 4, MUTED, false);
+            text(context, label, x, y + 2, MUTED, false);
             String value = "< " + Lang.setting(mode.getMode()) + " >";
-            text(context, value, x + w - (int) mc.textRenderer.getWidth(value), y + 4, ACCENT, false);
+            text(context, value, x + w - (int) mc.textRenderer.getWidth(value), y + 2, ACCENT, false);
         } else if (setting instanceof KeybindSetting keybind) {
-            text(context, label, x, y + 4, MUTED, false);
-            String value = keybind.isListening() ? Lang.ui("listening") : keyName(keybind.getKeyCode());
-            text(context, value, x + w - (int) mc.textRenderer.getWidth(value), y + 4, ACCENT, false);
+            text(context, label, x, y + 2, MUTED, false);
+            String value = keybind.isListening() ? "..." : keyName(keybind.getKeyCode());
+            text(context, value, x + w - (int) mc.textRenderer.getWidth(value), y + 2, ACCENT, false);
         } else if (setting instanceof StringSetting stringSetting) {
-            text(context, label + ": " + stringSetting.getValue(), x, y + 4, MUTED, false);
+            text(context, label + ": " + stringSetting.getValue(), x, y + 2, MUTED, false);
         } else {
-            text(context, label, x, y + 4, MUTED, false);
+            text(context, label, x, y + 2, MUTED, false);
         }
+    }
+
+    private void drawTooltip(DrawContext context, Module module, int mouseX, int mouseY) {
+        String description = Lang.setting(module.getDescription());
+        if (description == null || description.isEmpty()) return;
+        int tw = Math.min((int) mc.textRenderer.getWidth(description) + 12, 220);
+        int tx = Math.min(mouseX + 8, width - tw - 10);
+        int ty = Math.min(mouseY + 8, height - 22);
+        round(context, tx, ty, tw, 18, 4, new Color(16, 16, 20, 240));
+        context.drawBorder(tx, ty, tw, 18, BORDER.getRGB());
+        String value = description;
+        while (mc.textRenderer.getWidth(value) > tw - 10 && value.length() > 4) {
+            value = value.substring(0, value.length() - 2);
+        }
+        text(context, value, tx + 5, ty + 5, TEXT, false);
     }
 
     private boolean areAllEnabled() {
@@ -311,50 +314,52 @@ public final class VirusGui extends Screen {
     }
 
     private static String keyName(int key) {
-        if (key <= 0) return Lang.ui("listening");
+        if (key <= 0) return "...";
         String name = GLFW.glfwGetKeyName(key, 0);
         return name == null || name.isEmpty() ? "KEY" : name.toUpperCase(Locale.ROOT);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button != 0) {
-            return super.mouseClicked(mouseX, mouseY, button);
-        }
+        if (button != 0) return super.mouseClicked(mouseX, mouseY, button);
         layout();
         computeCards();
         int mx = (int) mouseX;
         int my = (int) mouseY;
 
-        if (hover(mx, my, closeX, winY + 8, 28, 28)) {
+        if (hover(mx, my, winX + winW - 30, winY + 8, 24, 24)) {
             close();
             return true;
         }
-        if (hover(mx, my, gridX, winY + 8, 28, 28)) {
-            twoColumns = !twoColumns;
-            scroll = 0;
-            return true;
-        }
-        if (hover(mx, my, langX, winY + 11, 30, 20)) {
+        if (hover(mx, my, langX, winY + winH - 28, 30, 18)) {
             Lang.toggle();
             return true;
         }
-        searchFocused = hover(mx, my, searchX, winY + 10, searchW, 22);
-
-        if (hover(mx, my, allX, winY + 14, 26, 14)) {
-            boolean enable = !areAllEnabled();
-            for (Module module : filteredModules()) module.setEnabled(enable);
+        if (hover(mx, my, iconStarX - 12, searchY, 24, searchH)) {
+            selectedId = "favorites";
+            scroll = 0;
             return true;
         }
+        if (hover(mx, my, iconTargetX - 12, searchY, 24, searchH)) {
+            selectedId = "combat";
+            scroll = 0;
+            return true;
+        }
+        if (hover(mx, my, iconFriendsX - 12, searchY, 24, searchH)) {
+            selectedId = "friends";
+            scroll = 0;
+            return true;
+        }
+        searchFocused = hover(mx, my, searchX, searchY, searchW, searchH);
 
-        int navY = winY + 62;
+        int navY = winY + 42;
         for (NavItem item : nav) {
-            if (item.id != null && hover(mx, my, winX + 10, navY - 3, SIDEBAR_W - 20, 22)) {
+            if (hover(mx, my, winX + 8, navY - 3, RAIL_W - 16, 20)) {
                 selectedId = item.id;
                 scroll = 0;
                 return true;
             }
-            navY += 26;
+            navY += 24;
         }
 
         if (mx < contentX || mx > contentX + contentW || my < contentY || my > contentY + contentH) {
@@ -364,34 +369,31 @@ public final class VirusGui extends Screen {
         for (CardRect card : cards) {
             if (mx < card.x || mx > card.x + card.w || my < card.y || my > card.y + card.h) continue;
 
-            if (hover(mx, my, card.x + 8, card.y + 8, 16, 16)) {
-                if (!FAVOURITES.add(card.module.getName())) FAVOURITES.remove(card.module.getName());
+            if (hover(mx, my, card.x + card.w - 22, card.y + 5, 18, 16)) {
+                String id = card.module.getName();
+                if (!FAVOURITES.add(id)) FAVOURITES.remove(id);
                 return true;
             }
-            if (hover(mx, my, card.x + card.w - 26, card.y + 8, 22, 18)) {
+            if (hover(mx, my, card.x + card.w - 40, card.y + 5, 16, 16)) {
                 card.module.toggle();
-                return true;
-            }
-            if (hover(mx, my, card.x + card.w - 46, card.y + 8, 16, 18)) {
-                EXPANDED.put(card.module.getName(), !card.expanded);
                 return true;
             }
             if (my <= card.y + CARD_H) {
-                card.module.toggle();
+                EXPANDED.put(card.module.getName(), !card.expanded);
                 return true;
             }
 
-            int sy = card.y + CARD_H + 4;
-            int sx = card.x + 10;
-            int sw = card.w - 20;
+            int sy = card.y + CARD_H + 2;
+            int sx = card.x + 6;
+            int sw = card.w - 12;
             for (Setting setting : card.module.getSettings()) {
                 if (setting instanceof BooleanSetting boolSetting) {
-                    if (hover(mx, my, sx + sw - 18, sy, 18, 16)) {
+                    if (hover(mx, my, sx + sw - 15, sy, 15, 14)) {
                         boolSetting.toggle();
                         return true;
                     }
                 } else if (setting instanceof NumberSetting number) {
-                    if (hover(mx, my, sx, sy + 10, sw, 10)) {
+                    if (hover(mx, my, sx, sy + 8, sw, 8)) {
                         draggedSlider = number;
                         sliderX = sx;
                         sliderW = sw;
@@ -399,12 +401,12 @@ public final class VirusGui extends Screen {
                         return true;
                     }
                 } else if (setting instanceof ModeSetting mode) {
-                    if (hover(mx, my, sx, sy, sw, 16)) {
+                    if (hover(mx, my, sx, sy, sw, 14)) {
                         mode.cycle();
                         return true;
                     }
                 } else if (setting instanceof KeybindSetting keybind) {
-                    if (hover(mx, my, sx, sy, sw, 16)) {
+                    if (hover(mx, my, sx, sy, sw, 14)) {
                         for (Module other : SilkClient.INSTANCE.getModuleManager().getModules()) {
                             for (Setting s : other.getSettings()) {
                                 if (s instanceof KeybindSetting k) k.setListening(false);
@@ -427,7 +429,10 @@ public final class VirusGui extends Screen {
             applySlider((int) mouseX);
             return true;
         }
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        scroll -= deltaY * 0.6f;
+        if (scroll < 0) scroll = 0;
+        if (maxScroll > 0) scroll = Math.min(maxScroll, scroll);
+        return true;
     }
 
     @Override
@@ -444,7 +449,7 @@ public final class VirusGui extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        scroll -= verticalAmount * 24f;
+        scroll -= verticalAmount * 22f;
         if (scroll < 0) scroll = 0;
         if (maxScroll > 0) scroll = Math.min(maxScroll, scroll);
         return true;
@@ -515,40 +520,38 @@ public final class VirusGui extends Screen {
         }
     }
 
-    private static void heart(DrawContext c, int x, int y, Color color) {
-        circle(c, x + 3, y + 3, 2, color);
-        circle(c, x + 7, y + 3, 2, color);
-        for (int i = 0; i < 6; i++) {
-            c.fill(x + 1 + i / 2, y + 4 + i, x + 9 - i / 2, y + 5 + i, color.getRGB());
+    private static void drawCheck(DrawContext c, int x, int y, boolean enabled) {
+        c.drawBorder(x, y, 9, 9, enabled ? ACCENT.getRGB() : BORDER.getRGB());
+        if (enabled) {
+            c.fill(x + 2, y + 5, x + 4, y + 7, ACCENT.getRGB());
+            c.fill(x + 4, y + 3, x + 8, y + 5, ACCENT.getRGB());
         }
+    }
+
+    private static void drawStarIcon(DrawContext c, int x, int y, boolean active) {
+        Color color = active ? new Color(255, 205, 90, 255) : MUTED;
+        c.fill(x, y, x + 3, y + 7, color.getRGB());
+        c.fill(x + 7, y, x + 10, y + 7, color.getRGB());
+        for (int i = 0; i < 5; i++) c.fill(x + i, y + i + 1, x + 10 - i, y + i + 2, color.getRGB());
+    }
+
+    private static void drawPeopleIcon(DrawContext c, int x, int y) {
+        circle(c, x + 3, y + 2, 2, MUTED);
+        circle(c, x + 9, y + 2, 2, MUTED);
+        c.fill(x, y + 5, x + 5, y + 10, MUTED.getRGB());
+        c.fill(x + 7, y + 5, x + 12, y + 10, MUTED.getRGB());
+    }
+
+    private static void drawCrosshairIcon(DrawContext c, int x, int y) {
+        c.fill(x + 5, y, x + 7, y + 5, MUTED.getRGB());
+        c.fill(x + 5, y + 7, x + 7, y + 12, MUTED.getRGB());
+        c.fill(x, y + 5, x + 5, y + 7, MUTED.getRGB());
+        c.fill(x + 7, y + 5, x + 12, y + 7, MUTED.getRGB());
     }
 
     private static void drawSearchIcon(DrawContext c, int x, int y) {
-        circle(c, x, y - 1, 3, MUTED);
-        c.fill(x + 3, y + 2, x + 4, y + 7, MUTED.getRGB());
-    }
-
-    private static void drawGridIcon(DrawContext c, int x, int y) {
-        for (int row = 0; row < 2; row++) {
-            for (int col = 0; col < 2; col++) {
-                c.fill(x + col * 5, y + row * 5, x + col * 5 + 4, y + row * 5 + 4, MUTED.getRGB());
-            }
-        }
-    }
-
-    private static void drawCloseIcon(DrawContext c, int x, int y) {
-        for (int i = -4; i <= 4; i++) {
-            c.fill(x + i, y + i, x + i + 1, y + i + 1, MUTED.getRGB());
-            c.fill(x + i, y - i, x + i + 1, y - i + 1, MUTED.getRGB());
-        }
-    }
-
-    private static void drawChevron(DrawContext c, int x, int y, boolean up) {
-        for (int i = 0; i < 4; i++) {
-            int width = 7 - i;
-            int yy = up ? y + i : y + 3 - i;
-            c.fill(x + i, yy, x + i + width, yy + 1, MUTED.getRGB());
-        }
+        circle(c, x, y, 3, MUTED);
+        c.fill(x + 3, y + 3, x + 4, y + 8, MUTED.getRGB());
     }
 
     private static void drawToggle(DrawContext c, int x, int y, boolean enabled) {
@@ -558,12 +561,12 @@ public final class VirusGui extends Screen {
 
     private static void drawCheckbox(DrawContext c, int x, int y, boolean enabled) {
         if (enabled) {
-            round(c, x, y, 14, 14, 3, ACCENT);
-            c.fill(x + 3, y + 7, x + 6, y + 10, WHITE.getRGB());
-            c.fill(x + 5, y + 5, x + 11, y + 7, WHITE.getRGB());
+            round(c, x, y, 12, 12, 3, ACCENT);
+            c.fill(x + 2, y + 6, x + 5, y + 9, WHITE.getRGB());
+            c.fill(x + 4, y + 4, x + 10, y + 6, WHITE.getRGB());
         } else {
-            round(c, x, y, 14, 14, 3, FIELD);
-            c.drawBorder(x, y, 14, 14, BORDER.getRGB());
+            round(c, x, y, 12, 12, 3, FIELD);
+            c.drawBorder(x, y, 12, 12, BORDER.getRGB());
         }
     }
 

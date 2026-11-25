@@ -28,7 +28,10 @@ public final class Lang {
             Map.entry("movement", "Движение"),
             Map.entry("player", "Игрок"),
             Map.entry("visual", "Визуалы"),
-            Map.entry("utilities", "Утилиты"),
+            Map.entry("all", "Все"),
+            Map.entry("renderer", "Рендер"),
+            Map.entry("particles", "Частицы"),
+            Map.entry("hint", "Введите ваш поисковый запрос..."),
             Map.entry("admin", "Администратор"),
             Map.entry("key", "Клавиша"),
             Map.entry("listening", "..."),
@@ -70,6 +73,11 @@ public final class Lang {
             Map.entry("Fast Exp", "Быстрый опыт"),
             Map.entry("Fast Mine", "Быстрая добыча"),
             Map.entry("Fast Place", "Быстрая установка"),
+            Map.entry("Fun Time", "Фан-тайм"),
+            Map.entry("Spooky Time", "Спуки-тайм"),
+            Map.entry("Particle Rain", "Дождь частиц"),
+            Map.entry("Aura Particles", "Аура частиц"),
+            Map.entry("Custom FOV", "Свой обзор"),
             Map.entry("Friends", "Друзья"),
             Map.entry("Full Bright", "Полная яркость"),
             Map.entry("Hit Cob", "Удар паутиной"),
@@ -212,6 +220,11 @@ public final class Lang {
                 case "player" -> "Player";
                 case "visual" -> "Visuals";
                 case "utilities" -> "Utilities";
+                case "all" -> "All";
+                case "renderer" -> "Renderer";
+                case "visual" -> "Visual";
+                case "particles" -> "Particles";
+                case "hint" -> "Enter your search query...";
                 case "admin" -> "Administrator";
                 case "key" -> "Keybind";
                 case "listening" -> "...";
