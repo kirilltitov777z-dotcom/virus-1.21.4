@@ -11,6 +11,7 @@ import cc.silk.utils.friend.FriendManager;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -34,6 +35,9 @@ public final class KillAura extends Module {
 
     private final ModeSetting mode = new ModeSetting("Type", "Smooth", "Smooth", "Instant");
     private final ModeSetting priority = new ModeSetting("Priority", "Distance", "Distance", "Health", "FOV");
+    private final ModeSetting targetMode = new ModeSetting("Target Mode", "Single", "Single", "Switch");
+    private final NumberSetting switchTime = new NumberSetting("Switch Time (S)", 0.5, 10.0, 2.0, 0.5);
+    private final BooleanSetting armorStands = new BooleanSetting("Armor Stands", false);
     private final NumberSetting range = new NumberSetting("Attack Range", 3.0, 6.0, 3.3, 0.1);
     private final NumberSetting aimRange = new NumberSetting("Aim Range", 3.0, 40.0, 15.0, 0.5);
     private final NumberSetting aps = new NumberSetting("Attacks per second", 1.0, 20.0, 10.0, 0.5);
@@ -52,10 +56,11 @@ public final class KillAura extends Module {
 
     private LivingEntity target;
     private long lastAttack;
+    private long lastSwitch;
 
     public KillAura() {
         super("Kill Aura", "Automatically tracks and attacks nearby targets", Category.COMBAT);
-        addSettings(mode, priority, range, aimRange, aps, rotationSpeed, fov, targetPlayers, targetMobs,
+        addSettings(mode, priority, targetMode, switchTime, armorStands, range, aimRange, aps, rotationSpeed, fov, targetPlayers, targetMobs,
                 targetAnimals, targetInvisible, throughWalls, onlyCrits, focusTarget, breakShield,
                 movementCorrection);
     }
@@ -64,8 +69,14 @@ public final class KillAura extends Module {
     private void onTick(TickEvent event) {
         if (isNull() || mc.currentScreen != null) return;
 
+        if (targetMode.isMode("Switch") && target != null
+                && System.currentTimeMillis() - lastSwitch > switchTime.getValue() * 1000L) {
+            target = null;
+            lastSwitch = System.currentTimeMillis();
+        }
         if (target == null || !isValid(target) || !focusTarget.getValue()) {
             target = findTarget();
+            lastSwitch = System.currentTimeMillis();
         }
         if (target == null) return;
 
@@ -103,6 +114,9 @@ public final class KillAura extends Module {
         if (mc.player.distanceTo(entity) > aimRange.getValue()) return false;
         if (!targetInvisible.getValue() && entity.isInvisible()) return false;
         if (!throughWalls.getValue() && !mc.player.canSee(entity)) return false;
+        if (entity instanceof ArmorStandEntity) {
+            return armorStands.getValue();
+        }
         if (entity instanceof PlayerEntity player) {
             if (!targetPlayers.getValue()) return false;
             if (FriendManager.isFriend(player.getUuid())) return false;

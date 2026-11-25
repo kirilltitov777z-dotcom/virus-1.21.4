@@ -10,6 +10,7 @@ public enum Category {
     RENDER("Render"),
     VISUAL("Visual"),
     PARTICLES("Particles"),
+    FARM("Farm"),
     MISC("Misc"),
     CLIENT("Client"),
     CONFIG("Config");

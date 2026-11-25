@@ -41,7 +41,7 @@ public final class VirusGui extends Screen {
     private static final Color BORDER = new Color(52, 52, 60, 255);
     private static final Color TEXT = new Color(228, 228, 234, 255);
     private static final Color MUTED = new Color(132, 132, 144, 255);
-    private static final Color ACCENT = new Color(96, 152, 255, 255);
+    private static final Color ACCENT = new Color(158, 112, 255, 255);
     private static final Color TRACK = new Color(66, 66, 74, 255);
     private static final Color WHITE = new Color(255, 255, 255, 255);
     private static final Color RED = new Color(236, 92, 92, 255);
@@ -83,6 +83,7 @@ public final class VirusGui extends Screen {
         nav.add(new NavItem("renderer", Category.RENDER));
         nav.add(new NavItem("visual", Category.VISUAL));
         nav.add(new NavItem("particles", Category.PARTICLES));
+        nav.add(new NavItem("farm", Category.FARM));
         nav.add(new NavItem("client", Category.CLIENT));
 
         EXPANDED.putIfAbsent("Kill Aura", true);
@@ -185,6 +186,8 @@ public final class VirusGui extends Screen {
         round(context, winX, winY, winW, winH, 8, WINDOW);
         round(context, winX, winY, RAIL_W, winH, 8, SIDEBAR);
         context.fill(winX + RAIL_W - 6, winY, winX + RAIL_W, winY + winH, SIDEBAR.getRGB());
+        context.fill(winX + RAIL_W, winY, winX + winW - 8, winY + 1, new Color(120, 70, 220, 180).getRGB());
+        context.fill(winX + 8, winY + winH - 2, winX + RAIL_W - 8, winY + winH - 1, new Color(120, 70, 220, 160).getRGB());
 
         drawRail(context);
         drawTopBar(context);

@@ -11,7 +11,7 @@
     "Virus (based on Silk by koi)"
   ],
   "license": "MIT",
-  "icon": "assets/silk/icon.png",
+  "icon": "assets/silk/textures/logo.png",
   "environment": "client",
   "entrypoints": {
     "client": [

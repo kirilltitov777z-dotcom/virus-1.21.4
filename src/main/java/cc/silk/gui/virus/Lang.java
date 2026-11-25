@@ -31,6 +31,7 @@ public final class Lang {
             Map.entry("all", "Все"),
             Map.entry("renderer", "Рендер"),
             Map.entry("particles", "Частицы"),
+            Map.entry("farm", "Фарм"),
             Map.entry("hint", "Введите ваш поисковый запрос..."),
             Map.entry("admin", "Администратор"),
             Map.entry("key", "Клавиша"),
@@ -78,6 +79,10 @@ public final class Lang {
             Map.entry("Particle Rain", "Дождь частиц"),
             Map.entry("Aura Particles", "Аура частиц"),
             Map.entry("Custom FOV", "Свой обзор"),
+            Map.entry("Matrix Rain", "Матрица"),
+            Map.entry("Auto Farm", "Авто-ферма"),
+            Map.entry("Auto Fisher", "Авто-рыбалка"),
+            Map.entry("Auto Auction", "Авто-аукцион"),
             Map.entry("Friends", "Друзья"),
             Map.entry("Full Bright", "Полная яркость"),
             Map.entry("Hit Cob", "Удар паутиной"),
@@ -155,6 +160,9 @@ public final class Lang {
             Map.entry("Profile", "Профиль"), Map.entry("Enforce", "Применять"), Map.entry("Limits", "Ограничения"),
             Map.entry("Event", "Событие"), Map.entry("Interval", "Интервал"),
             Map.entry("CPS", "Клики"), Map.entry("Click", "Клик"),
+            Map.entry("Keyword", "Ключевое слово"), Map.entry("Buy", "Купить"), Map.entry("Sell", "Продать"),
+            Map.entry("Auction", "Аукцион"), Map.entry("Price", "Цена"), Map.entry("Columns", "Колонки"),
+            Map.entry("Stands", "Стойки"), Map.entry("Fisher", "Рыболов"), Map.entry("Farm", "Ферма"),
             Map.entry("Hold", "Удерживать"), Map.entry("Sneak", "Приседание"), Map.entry("Fly", "Полёт"),
             Map.entry("Space", "Пробел"), Map.entry("Jump", "Прыжок"), Map.entry("Sprint", "Спринт"),
             Map.entry("Container", "Контейнер"), Map.entry("Chest", "Сундук"),
@@ -226,6 +234,7 @@ public final class Lang {
                 case "all" -> "All";
                 case "renderer" -> "Renderer";
                 case "particles" -> "Particles";
+                case "farm" -> "Farming";
                 case "hint" -> "Enter your search query...";
                 case "admin" -> "Administrator";
                 case "key" -> "Keybind";

@@ -71,14 +71,16 @@ public final class ModuleManager {
                 new AutoExtinguish(), new AutoTool(), new AutoWeb(), new AutoRefill(),
                 new AutoDrain(), new AutoCrafter(), new FastPlace(), new FastEXP(),
                 new TrapSave(), new PingSpoof(), new AutoDoubleHand(),
-                new AutoMLG(), new FastMine(), new ReBuffNotifier(), new CoverUp());
+                new AutoMLG(), new FastMine(), new ReBuffNotifier(), new CoverUp(),
+                new AutoFarm(), new AutoFisher(), new AutoAuction());
 
         // Render
         add(
                 new ContainerSlots(), new FullBright(), new Watermark(), new TargetHUD(),
                 new SwingSpeed(),
                 new Notifications(), new ArrowESP(), new OutlineESP(), new ESP2D(), new TargetESP(),
-                new ArrayList(), new Trajectories(), new ParticleRain(), new AuraParticles(), new CustomFov());
+                new ArrayList(), new Trajectories(), new ParticleRain(), new AuraParticles(), new CustomFov(),
+                new MatrixRain());
 
         // Misc
         add(
