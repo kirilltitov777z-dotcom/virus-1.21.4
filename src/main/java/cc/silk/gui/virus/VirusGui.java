@@ -8,6 +8,7 @@ import cc.silk.module.setting.KeybindSetting;
 import cc.silk.module.setting.ModeSetting;
 import cc.silk.module.setting.NumberSetting;
 import cc.silk.module.setting.Setting;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -27,6 +28,8 @@ import java.util.Set;
  * cards with favourite hearts, inline switches and expandable settings.
  */
 public final class VirusGui extends Screen {
+
+    private final MinecraftClient mc = MinecraftClient.getInstance();
 
     private static final Color WINDOW = new Color(20, 20, 23, 255);
     private static final Color SIDEBAR = new Color(14, 14, 16, 255);
@@ -127,7 +130,7 @@ public final class VirusGui extends Screen {
                 round(context, winX + 10, y - 3, SIDEBAR_W - 20, 22, 5, new Color(38, 38, 45, 255));
                 context.fill(winX + 10, y - 3, 3, 22, ACCENT.getRGB());
             }
-            int color = active ? TEXT.getRGB() : new Color(150, 150, 160, 255).getRGB();
+            Color color = active ? TEXT : new Color(150, 150, 160, 255);
             text(context, item.label, winX + 24, y + 2, color, active);
             y += 26;
         }
