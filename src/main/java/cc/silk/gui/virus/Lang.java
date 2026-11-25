@@ -79,7 +79,6 @@ public final class Lang {
             Map.entry("Particle Rain", "Дождь частиц"),
             Map.entry("Aura Particles", "Аура частиц"),
             Map.entry("Custom FOV", "Свой обзор"),
-            Map.entry("Matrix Rain", "Матрица"),
             Map.entry("Auto Farm", "Авто-ферма"),
             Map.entry("Auto Fisher", "Авто-рыбалка"),
             Map.entry("Auto Auction", "Авто-аукцион"),

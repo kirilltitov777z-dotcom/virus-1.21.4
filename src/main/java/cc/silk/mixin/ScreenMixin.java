@@ -1,11 +1,13 @@
 package cc.silk.mixin;
 
 import cc.silk.gui.ClickGui;
+import cc.silk.gui.crest.MainMenu;
 import cc.silk.gui.newgui.NewClickGUI;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.TitleScreen;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -24,6 +26,11 @@ public abstract class ScreenMixin {
     private void renderBackgroundInject(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (client == null) return;
         Screen currentScreen = client.currentScreen;
+        if (currentScreen instanceof TitleScreen) {
+            MainMenu.drawBackground(client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
+            ci.cancel();
+            return;
+        }
         if (currentScreen instanceof ClickGui) {
             ci.cancel();
             return;
@@ -33,10 +40,19 @@ public abstract class ScreenMixin {
         }
     }
 
+    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
+    private void onMouseClick(double mouseX, double mouseY, int button, CallbackInfo ci) {
+        if (client == null || !(client.currentScreen instanceof TitleScreen)) return;
+        if (MainMenu.mouseClicked(mouseX, mouseY, button)) ci.cancel();
+    }
+
     @Inject(method = "render", at = @At("TAIL"))
     private void onRenderTail(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (client == null) return;
         Screen currentScreen = client.currentScreen;
+        if (currentScreen instanceof TitleScreen) {
+            MainMenu.drawOverlay(context, mouseX, mouseY);
+        }
         if (currentScreen instanceof NewClickGUI || currentScreen instanceof ClickGui) {
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
             RenderSystem.enableBlend();
