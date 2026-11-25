@@ -298,6 +298,17 @@ public final class TriggerBot extends Module {
         waitingForDelay = false;
     }
 
+    /** Called by server bypass profiles. */
+    public void applyServerBypass(double maxDelay, boolean strict) {
+        cooldownMode.setMode("Smart");
+        pauseOnVelocity.setValue(true);
+        antiDetect.setValue(true);
+        if (strict) {
+            reactionTime.setMinValue(Math.max(reactionTime.getMinValue(), Math.min(40, maxDelay)));
+            onlyGround.setValue(true);
+        }
+    }
+
     public boolean hasTarget(Entity en) {
         if (en == mc.player || en == mc.cameraEntity || !en.isAlive())
             return false;

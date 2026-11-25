@@ -278,6 +278,16 @@ public class AimAssist extends Module {
         lastUpdateTime = System.currentTimeMillis();
     }
 
+    /** Called by server bypass profiles. */
+    public void applyServerBypass(boolean strict) {
+        gcd.setValue(true);
+        antiDetect.setValue(true);
+        if (strict) {
+            throughWalls.setValue(false);
+            onlyGround.setValue(true);
+        }
+    }
+
     @Override
     public void onDisable() {
         super.onDisable();

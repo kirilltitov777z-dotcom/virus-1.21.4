@@ -16,8 +16,12 @@
   Movement / Player / Renderer / Visual / Particles / Client`, поиск с быстрыми
   фильтрами (друзья / цель / избранное), сетка карточек в три колонки, описание
   каждой функции по наведению.
-- **Новые модули:** `Fun Time`, `Spooky Time` (таймеры событий), `Particle Rain`,
-  `Aura Particles`, `Custom FOV`.
+- **Новые модули:** `Fun Time`, `Spooky Time` — серверные профили-обходы для
+  FunTime/SpookyTime: принудительные лимиты CPS/ротации для KillAura, AimAssist и
+  Trigger Bot, Anti-Detect, таймер событий.
+- `Particle Rain` / `Aura Particles` — вариации форм (дождь, сердце, звезда,
+  доллар, спираль, кольцо) и цветовых пресетов (красный, золото, фиолетовый,
+  белый, голубой). `Custom FOV` — категория Visual.
 - **Обходы для Aim Assist и Trigger Bot:** Anti-Detect, задержка смены цели,
   Only on Ground, Pause on Velocity, Reset on Death, GCD.
 - **Kill Aura** — новый модуль с фильтрацией и сортировкой целей, GCD-ротацией,

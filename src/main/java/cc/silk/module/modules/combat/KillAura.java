@@ -190,6 +190,16 @@ public final class KillAura extends Module {
         lastAttack = now;
     }
 
+    /** Called by server bypass profiles to keep the module inside safe limits. */
+    public void applyServerBypass(double maxAps, double maxRotation, boolean strict) {
+        aps.setValue(Math.min(aps.getValue(), maxAps));
+        rotationSpeed.setValue(Math.min(rotationSpeed.getValue(), maxRotation));
+        if (strict) {
+            throughWalls.setValue(false);
+            onlyCrits.setValue(false);
+        }
+    }
+
     @Override
     public void onDisable() {
         target = null;
